@@ -45,25 +45,19 @@ This is a cons cell of '(bright . dark)")
 				 (hue (buffer-modeline-color-hue-for-string name))
          (is-dark (eq (frame-parameter (next-frame) 'background-mode) 'dark))
          (value-getter (if is-dark #'cdr #'car)))
-    (cl-flet* ((dark-aware-color (sat val)
-                                 (color-hsl-to-rgb
-                                  hue
-                                  (funcall value-getter sat)
-                                  (funcall value-getter val)))
-               (dark-aware-color-hex (sat val) (apply #'color-rgb-to-hex (dark-aware-color sat val))))
-      (setq buffer-modeline-color-active-face-remap-token
-            (face-remap-add-relative 'mode-line
-                                     (let ((col (dark-aware-color-hex
-                                                 buffer-modeline-color-active-saturation
-                                                 buffer-modeline-color-active-value)))
-															         `(:background ,col))
-															       'mode-line))
-			(setq buffer-modeline-color-inactive-face-remap-token
-            (face-remap-add-relative 'mode-line-inactive
-                                     (let ((col (dark-aware-color-hex
-                                                 buffer-modeline-color-inactive-saturation
-                                                 buffer-modeline-color-inactive-value)))
-															         `(:background ,col))
-                                     'mode-line-inactive))
-			)))
+    (setq buffer-modeline-color-active-face-remap-token
+          (face-remap-add-relative 'mode-line
+                                   (let* ((sat (funcall value-getter buffer-modeline-color-active-saturation))
+                                          (val (funcall value-getter buffer-modeline-color-active-value))
+                                          (col (apply #'color-rgb-to-hex (color-hsl-to-rgb hue sat val))))
+															       `(:background ,col))
+															     'mode-line))
+		(setq buffer-modeline-color-inactive-face-remap-token
+          (face-remap-add-relative 'mode-line-inactive
+                                   (let* ((sat (funcall value-getter buffer-modeline-color-inactive-saturation))
+                                          (val (funcall value-getter buffer-modeline-color-inactive-value))
+                                          (col (apply #'color-rgb-to-hex (color-hsl-to-rgb hue sat val))))
+															       `(:background ,col))
+                                   'mode-line-inactive))
+		))
 (provide 'buffer-modeline-color)

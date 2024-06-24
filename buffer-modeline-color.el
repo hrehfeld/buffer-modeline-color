@@ -64,4 +64,18 @@ This is a cons cell of '(bright . dark)")
 															       `(:background ,col))
                                    'mode-line-inactive))
 		))
+
+(define-minor-mode buffer-modeline-color-mode
+  "Toggle buffer-modeline-color-mode."
+  :local t
+  :init-value nil
+  (if buffer-modeline-color-mode
+      (progn
+        (add-hook 'after-revert-hook #'buffer-modeline-color)
+        (add-hook 'window-configuration-change-hook #'buffer-modeline-color)
+        (add-hook 'buffer-list-update-hook #'buffer-modeline-color))
+    (remove-hook 'after-revert-hook #'buffer-modeline-color)
+    (remove-hook 'window-configuration-change-hook #'buffer-modeline-color)
+    (remove-hook 'buffer-list-update-hook #'buffer-modeline-color)))
+
 (provide 'buffer-modeline-color)

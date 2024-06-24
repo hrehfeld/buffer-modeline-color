@@ -45,6 +45,8 @@ This is a cons cell of '(bright . dark)")
 				 (hue (buffer-modeline-color-hue-for-string name))
          (is-dark (eq (frame-parameter (next-frame) 'background-mode) 'dark))
          (value-getter (if is-dark #'cdr #'car)))
+    (when buffer-modeline-color-active-face-remap-token
+      (face-remap-remove-relative buffer-modeline-color-active-face-remap-token))
     (setq buffer-modeline-color-active-face-remap-token
           (face-remap-add-relative 'mode-line
                                    (let* ((sat (funcall value-getter buffer-modeline-color-active-saturation))
@@ -52,6 +54,8 @@ This is a cons cell of '(bright . dark)")
                                           (col (apply #'color-rgb-to-hex (color-hsl-to-rgb hue sat val))))
 															       `(:background ,col))
 															     'mode-line))
+    (when buffer-modeline-color-inactive-face-remap-token
+      (face-remap-remove-relative buffer-modeline-color-inactive-face-remap-token))
 		(setq buffer-modeline-color-inactive-face-remap-token
           (face-remap-add-relative 'mode-line-inactive
                                    (let* ((sat (funcall value-getter buffer-modeline-color-inactive-saturation))
